@@ -9,11 +9,18 @@ http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
         <load-on-startup>1</load-on-startup>
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>classpath:Config/springmvc-servlet.xml</param-value>
+            <param-value>classpath:config/springmvc-servlet.xml</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>springmvc</servlet-name>
         <url-pattern>/web-store/*</url-pattern>
     </servlet-mapping>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:config/root-context.xml</param-value>
+    </context-param>
 </web-app>

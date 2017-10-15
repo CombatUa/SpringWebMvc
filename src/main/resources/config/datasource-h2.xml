@@ -8,8 +8,8 @@
     http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd">
 
     <jdbc:embedded-database id="dataSource" type="H2">
-        <jdbc:script location="classpath:DB/schema.sql"/>
-        <jdbc:script location="classpath:DB/data.sql"/>
+        <jdbc:script location="classpath:db/schema.sql"/>
+        <jdbc:script location="classpath:db/data.sql"/>
     </jdbc:embedded-database>
 
 

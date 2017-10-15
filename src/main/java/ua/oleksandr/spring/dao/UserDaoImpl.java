@@ -3,6 +3,7 @@ package ua.oleksandr.spring.dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -26,6 +27,13 @@ public class UserDaoImpl implements UserDao {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private JdbcTemplate jdbcTemplate;
 
+
+    private PhoneDao phoneDao;
+
+    public void setPhoneDao(PhoneDao phoneDao) {
+        this.phoneDao = phoneDao;
+    }
+
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -34,7 +42,10 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> getAll() {
         List<User> users = null;
-        users = jdbcTemplate.query(SQL_SELECT_ALL_USERS, new BeanPropertyRowMapper(User.class));
+//        users = jdbcTemplate.query(SQL_SELECT_ALL_USERS, new BeanPropertyRowMapper<User>(User.class));
+        users = jdbcTemplate.query(SQL_SELECT_ALL_USERS, new UserRowMapper());
+
+        users.forEach((u) -> u.setPhones(phoneDao.getAll(u.getId())));
         log.debug("getAll: {}", users.stream().map(User::getLastName).collect(Collectors.toList()));
         return users;
     }
@@ -42,7 +53,8 @@ public class UserDaoImpl implements UserDao {
     @Override
     public User getEntityByKey(Long key) {
         User user = null;
-        user = (User) jdbcTemplate.queryForObject(SQL_SELECT_USERS, new Object[]{key}, new BeanPropertyRowMapper(User.class));
+//        user = (User) jdbcTemplate.queryForObject(SQL_SELECT_USERS, new Object[]{key}, new BeanPropertyRowMapper<User>(User.class));
+        user = jdbcTemplate.queryForObject(SQL_SELECT_USERS, new Object[]{key}, new UserRowMapper());
         log.debug("getEntityByKey {}", user);
 
         return user;
@@ -68,12 +80,13 @@ public class UserDaoImpl implements UserDao {
         Long id = keyHolder.getKey().longValue();
         log.debug("create User Id :{}", id);
 
-        isSuccess = (id != null);
-        if (isSuccess) {
-            entity.setId(id);
+        List<Phone> phones = entity.getPhones();
+        if (phones != null && !phones.isEmpty()) {
+            phoneDao.create(id, phones);
         }
 
-        return isSuccess ? id : null;
+        entity.setId(id);
+        return id;
     }
 
     @Override
@@ -85,8 +98,14 @@ public class UserDaoImpl implements UserDao {
         int numOfRows = jdbcTemplate.update(SQL_UPDATE_USER, entity.getFirstName(), entity.getLastName(), entity.getSalary(), entity.getDateOfBirth(),
                 entity.getId());
         isSuccess = numOfRows > 0;
+        List<Phone> phones = entity.getPhones();
+        if (isSuccess) {
+            phoneDao.delete(entity.getId());
+            if (phones != null && !phones.isEmpty()) {
+                phoneDao.create(entity.getId(),entity.getPhones());
+            }
+        }
         log.debug("update isSuccess:{}", isSuccess);
-
         return isSuccess;
     }
 
@@ -94,10 +113,10 @@ public class UserDaoImpl implements UserDao {
     public boolean delete(Long key) {
         boolean isSuccess = true;
         log.debug("delete key:{}", key);
+        phoneDao.delete(key);
         int numOfRows = jdbcTemplate.update(SQL_DELETE_USER, key);
         isSuccess = numOfRows > 0;
         log.debug("delete isSuccess:{}", isSuccess);
-
         return isSuccess;
     }
 }

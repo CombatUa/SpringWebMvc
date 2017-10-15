@@ -10,9 +10,8 @@ import java.time.LocalDate;
 
 import static org.junit.Assert.*;
 
-@WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:Config/springmvc-servlet.xml"})
+@ContextConfiguration(locations = {"classpath:config/root-context.xml"})
 public class UserDaoImplTest {
 
     @Autowired

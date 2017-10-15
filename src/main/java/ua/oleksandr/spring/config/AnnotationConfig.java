@@ -12,28 +12,28 @@ import javax.sql.DataSource;
 
 @Configuration
 public class AnnotationConfig {
-    @Autowired
-    DataSource dataSource;
-
-    @Bean
-    public JdbcTemplate jdbcTemplate() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate();
-        jdbcTemplate.setDataSource(dataSource);
-        return jdbcTemplate;
-    }
-
-    @Bean
-    public UserDao userDao() {
-        UserDaoImpl userDao = new UserDaoImpl();
-
-        userDao.setJdbcTemplate(jdbcTemplate());
-        return userDao;
-    }
-
-    @Bean
-    public UserService userService() {
-        return new UserService();
-    }
+//    @Autowired
+//    DataSource dataSource;
+//
+//    @Bean
+//    public JdbcTemplate jdbcTemplate() {
+//        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+//        jdbcTemplate.setDataSource(dataSource);
+//        return jdbcTemplate;
+//    }
+//
+//    @Bean
+//    public UserDao userDao() {
+//        UserDaoImpl userDao = new UserDaoImpl();
+//
+//        userDao.setJdbcTemplate(jdbcTemplate());
+//        return userDao;
+//    }
+//
+//    @Bean
+//    public UserService userService() {
+//        return new UserService();
+//    }
 
 }
 
